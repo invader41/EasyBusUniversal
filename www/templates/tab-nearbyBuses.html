@@ -1,0 +1,10 @@
+<ion-view view-title="周边站点">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item" ng-repeat="poi in pois" type="item-text-wrap" >
+        <h2>{{poi.name}}</h2>
+        <p>{{poi.address}}</p>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

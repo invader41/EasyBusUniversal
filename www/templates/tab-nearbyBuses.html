@@ -1,10 +1,45 @@
 <ion-view view-title="周边站点">
+  <ion-nav-title ng-click="showPop($event)">
+    <!--<button class="button button-clear ion-location" style="height:100%;">
+      </button>-->
+    <i class="icon ion-location"></i>
+    {{currentStation.name}}
+    <i class="icon ion-chevron-down"></i>
+    <!--<button class="button button-clear ion-chevron-down" style="height:100%;">
+      </button>-->
+  </ion-nav-title>
+  <ion-nav-buttons side="left">
+    <button class="button button-clear icon ion-aperture">
+      </button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="right">
+    <button class="button button-clear icon ion-refresh">
+      </button>
+  </ion-nav-buttons>
   <ion-content>
-    <ion-list>
-      <ion-item class="item" ng-repeat="poi in pois" type="item-text-wrap" >
-        <h2>{{poi.name}}</h2>
-        <p>{{poi.address}}</p>
+    <ion-list can-swipe="true">
+      <ion-item class="item" ng-repeat="bus in buses" type="item-text-wrap">
+        <h2>{{bus.bus}}</h2>
+        <p>开往 {{bus.fromTo}} 方向</p>
+        <span class="item-note" style="font-size: 18px;">
+          {{bus.distance}}
+        </span>
+        <p>距离 {{currentStation.name}}</p>
       </ion-item>
     </ion-list>
   </ion-content>
+  <script id="nearbyStations-popover.html" type="text/ng-template">
+    <ion-popover-view>
+      <ion-content>
+        <ion-list class="list-inset">
+          <ion-item class="item item-icon-left" ng-repeat="station in nearbyStations" type="item-text-wrap" ng-click="selectStation(station)">
+            <i class="icon ion-location"></i>
+            <h2>{{station.name}}</h2>
+            <p>{{station.address}}</p>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ion-popover-view>
+  </script>
 </ion-view>
+

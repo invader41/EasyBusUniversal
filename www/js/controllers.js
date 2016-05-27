@@ -73,6 +73,9 @@ angular.module('starter.controllers', [])
             
             $scope.buses.push(domBus);
           }
+          $scope.buses.sort(function(a, b) {
+            return b.bus-a.bus;
+          })
         }
       }).error(function (data, header, config, status) {
         //处理响应失败
@@ -81,6 +84,7 @@ angular.module('starter.controllers', [])
     };
 
     $scope.searchNearestStation = function () {
+      $scope.buses = [];
       CurrentLocation.get(function (position) {
         AMap.service('AMap.PlaceSearch', function () {//回调函数
           var placeSearch = new AMap.PlaceSearch();
@@ -126,7 +130,75 @@ angular.module('starter.controllers', [])
       $scope.searchNearestStation();
     });
   })
+  
+  .controller('BusDetailCtrl', function ($scope, $stateParams,$state, $ionicHistory, $http) {
+    var bus = angular.fromJson($stateParams.bus);
+    $scope.arrivals = [];
+    var map, geolocation;
+    //加载地图，调用浏览器定位服务
+    map = new AMap.Map('mapContainer', {
+        resizeEnable: true
+    });
 
+    map.plugin('AMap.Geolocation', function() {
+        geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            buttonPosition:'RB'
+        });
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+        AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
+    });
+    //解析定位结果
+    function onComplete(data) {
+    };
+    //解析定位错误信息
+    function onError(data) {
+    };
+    
+    $scope.backNav = function() {
+      $ionicHistory.goBack(); 
+    };
+    
+    $scope.searchBuslineArrivals = function (buslineCode) {
+      $http({
+        url: 'http://www.szjt.gov.cn/apts/APTSLine.aspx',
+        params: {
+          'LineGuid':buslineCode
+        },
+        header: { 'Accept': 'text/html' },
+        method: 'GET'
+      }).success(function (data, header, config, status) {
+        if (window.DOMParser)  //IE9+,FF,webkit
+        {
+          var domParser = new DOMParser();
+          var xmlDoc = domParser.parseFromString(data, 'text/html');
+          var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
+          for (var i = 1; i < nodelist.length; i++) {
+            var domArrival = {
+              stationCode: nodelist[i].children[1].textContent,
+              carCode: nodelist[i].children[2].textContent,
+              arrivalTime: nodelist[i].children[3].textContent
+            };
+            if(nodelist[i].children[0].children.length > 0) {
+              domArrival.stationName = nodelist[i].children[0].children[0].textContent;
+            }
+            $scope.arrivals.push(domArrival);
+          }
+        }
+      }).error(function (data, header, config, status) {
+        //处理响应失败
+        var b = 1;
+      });
+    };
+    
+    $scope.searchBuslineArrivals(bus.code);
+  })
+  
   .controller('DashCtrl', function ($scope) { })
 
   .controller('ChatsCtrl', function ($scope, Chats) {

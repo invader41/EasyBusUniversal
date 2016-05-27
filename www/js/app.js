@@ -62,7 +62,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
+      StatusBar.styleLightContent();
     }
   });
 })
@@ -90,6 +90,16 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       'tab-nearbyBuses': {
         templateUrl: 'templates/tab-nearbyBuses.html',
         controller: 'NearbyBusesCtrl'
+      }
+    }
+  })
+  
+  .state("tab.bus-detail", {
+    url: "/bus/:bus",
+    views: {
+      'tab-nearbyBuses': {
+          controller: "BusDetailCtrl",
+          templateUrl: 'templates/bus-detail.html'
       }
     }
   })

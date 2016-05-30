@@ -13,10 +13,11 @@
       </button>
   </ion-nav-buttons>
   <ion-nav-buttons side="right">
-    <button class="button button-clear icon ion-refresh" ng-click="searchNearestStation()">
+    <button class="button button-clear icon ion-refresh" ng-click="refreshBuses()">
       </button>
   </ion-nav-buttons>
   <ion-content class="dark-bg">
+    <ion-refresher pulling-text="刷新公交" on-refresh="refreshBuses()"></ion-refresher>
     <ion-list can-swipe="true">
       <ion-item class="item item-dark" ng-repeat="bus in buses" href="#/tab/bus/{{bus}}">
         <h2 class="stable">{{bus.bus}}</h2>
@@ -31,6 +32,7 @@
   <script id="nearbyStations-popover.html" type="text/ng-template">
     <ion-popover-view>
       <ion-content>
+        <ion-refresher pulling-text="刷新车站" on-refresh="refreshStations()"></ion-refresher>
         <ion-list>
           <ion-item class="item item-text-wrap" ng-repeat="station in nearbyStations" ng-click="selectStation(station)">
             <h2>{{station.name}}</h2>

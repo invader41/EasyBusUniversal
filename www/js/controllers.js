@@ -126,49 +126,51 @@ angular.module('starter.controllers', [])
       $scope.popover.hide();
     };
     
+    $scope.refreshBuses = function () {
+      $scope.searchStationsByName($scope.currentStation.name);
+      $scope.$broadcast('scroll.refreshComplete');
+    }
+    
+    $scope.refreshStations = function () {
+      $scope.searchNearestStation();
+      $scope.$broadcast('scroll.refreshComplete');
+    }
+    
     CordovaService.ready.then(function () {
       $scope.searchNearestStation();
     });
   })
   
-  .controller('BusDetailCtrl', function ($scope, $stateParams,$state, $ionicHistory, $http) {
+  .controller('BusDetailCtrl', function ($scope, $stateParams, $state, $ionicHistory, $http) {
     var bus = angular.fromJson($stateParams.bus);
     $scope.arrivals = [];
     var map, geolocation;
     //加载地图，调用浏览器定位服务
     map = new AMap.Map('mapContainer', {
-        resizeEnable: true
+      resizeEnable: true
     });
 
-    map.plugin('AMap.Geolocation', function() {
-        geolocation = new AMap.Geolocation({
-            enableHighAccuracy: true,//是否使用高精度定位，默认:true
-            timeout: 10000,          //超过10秒后停止定位，默认：无穷大
-            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-            zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-            buttonPosition:'RB'
-        });
-        map.addControl(geolocation);
-        geolocation.getCurrentPosition();
-        AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
-        AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
+    map.plugin('AMap.Geolocation', function () {
+      geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,//是否使用高精度定位，默认:true
+        timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+        buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+        buttonPosition: 'RB'
+      });
+      map.addControl(geolocation);
+      geolocation.getCurrentPosition();
     });
-    //解析定位结果
-    function onComplete(data) {
+
+
+    $scope.backNav = function () {
+      $ionicHistory.goBack();
     };
-    //解析定位错误信息
-    function onError(data) {
-    };
-    
-    $scope.backNav = function() {
-      $ionicHistory.goBack(); 
-    };
-    
+
     $scope.searchBuslineArrivals = function (buslineCode) {
       $http({
         url: 'http://www.szjt.gov.cn/apts/APTSLine.aspx',
         params: {
-          'LineGuid':buslineCode
+          'LineGuid': buslineCode
         },
         header: { 'Accept': 'text/html' },
         method: 'GET'
@@ -184,10 +186,13 @@ angular.module('starter.controllers', [])
               carCode: nodelist[i].children[2].textContent,
               arrivalTime: nodelist[i].children[3].textContent
             };
-            if(nodelist[i].children[0].children.length > 0) {
+            if (nodelist[i].children[0].children.length > 0) {
               domArrival.stationName = nodelist[i].children[0].children[0].textContent;
             }
             $scope.arrivals.push(domArrival);
+          }
+          $scope.arrivalContainer = {
+            'width': $scope.arrivals.length * 40 + 'px'
           }
         }
       }).error(function (data, header, config, status) {
@@ -195,8 +200,70 @@ angular.module('starter.controllers', [])
         var b = 1;
       });
     };
-    
     $scope.searchBuslineArrivals(bus.code);
+
+    /*公交线路查询*/
+    function lineSearch() {
+      //实例化公交线路查询类，只取回一条路线
+      var linesearch = new AMap.LineSearch({
+        pageIndex: 1,
+        city: '苏州',
+        pageSize: 1,
+        extensions: 'all'
+      });
+      //搜索“536”相关公交线路
+      linesearch.search(bus.bus, function (status, result) {
+        if (status === 'complete' && result.info === 'OK') {
+          lineSearch_Callback(result);
+        } else {
+          alert(result);
+        }
+      });
+    };
+    /*公交路线查询服务返回数据解析概况*/
+    function lineSearch_Callback(data) {
+      var lineArr = data.lineInfo;
+      var lineNum = data.lineInfo.length;
+      if (lineNum == 0) {
+      } else {
+        for (var i = 0; i < lineNum; i++) {
+          var pathArr = lineArr[i].path;
+          var stops = lineArr[i].via_stops;
+          var startPot = stops[0].location;
+          var endPot = stops[stops.length - 1].location;
+
+          if (i == 0) drawbusLine(startPot, endPot, pathArr);
+        }
+      }
+    };
+    /*绘制路线*/
+    function drawbusLine(startPot, endPot, BusArr) {
+      //绘制起点，终点
+      new AMap.Marker({
+        map: map,
+        position: [startPot.lng, startPot.lat], //基点位置
+        icon: "http://webapi.amap.com/theme/v1.3/markers/n/start.png",
+        zIndex: 10
+      });
+      new AMap.Marker({
+        map: map,
+        position: [endPot.lng, endPot.lat], //基点位置
+        icon: "http://webapi.amap.com/theme/v1.3/markers/n/end.png",
+        zIndex: 10
+      });
+      //绘制乘车的路线
+      busPolyline = new AMap.Polyline({
+        map: map,
+        path: BusArr,
+        strokeColor: "#09f",//线颜色
+        strokeOpacity: 0.8,//线透明度
+        strokeWeight: 6//线宽
+      });
+      map.setFitView();
+    };
+    
+    lineSearch();
+    
   })
   
   .controller('DashCtrl', function ($scope) { })

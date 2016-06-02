@@ -49,6 +49,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
   $httpProvider.defaults.transformRequest = [function(data) {
     return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
   }];
+  // $httpProvider.interceptors.push('timeoutHttpIntercept');
 })
 
 .run(function($ionicPlatform) {
@@ -65,6 +66,13 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       StatusBar.styleLightContent();
     }
   });
+})
+
+.config(function($ionicConfigProvider) {
+  $ionicConfigProvider.tabs.position('bottom');
+  $ionicConfigProvider.tabs.style('standard');
+  $ionicConfigProvider.navBar.alignTitle('center');
+  $ionicConfigProvider.backButton.previousTitleText(false).text('返回');
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
@@ -94,8 +102,8 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
     }
   })
   
-  .state("tab.bus-detail", {
-    url: "/bus/:bus",
+  .state("tab.nearbyBuses-detail", {
+    url: "/nearbyBuses/:bus",
     views: {
       'tab-nearbyBuses': {
           controller: "BusDetailCtrl",
@@ -103,22 +111,33 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       }
     }
   })
+  
+  .state("tab.buslineSearch-detail", {
+    url: "/buslineSearch/:bus",
+    views: {
+      'tab-buslineSearch': {
+          controller: "BusDetailCtrl",
+          templateUrl: 'templates/bus-detail.html'
+      }
+    }
+  })
 
-  .state('tab.chats', {
-      url: '/chats',
+  .state('tab.buslineSearch', {
+      url: '/buslineSearch',
       views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
+        'tab-buslineSearch': {
+          templateUrl: 'templates/tab-buslineSearch.html',
+          controller: 'BuslineSearchCtrl'
         }
       }
     })
-    .state('tab.chat-detail', {
-      url: '/chats/:chatId',
+
+  .state('tab.busRouting', {
+      url: '/busRouting',
       views: {
-        'tab-chats': {
-          templateUrl: 'templates/chat-detail.html',
-          controller: 'ChatDetailCtrl'
+        'tab-busRouting': {
+          templateUrl: 'templates/tab-busRouting.html',
+          controller: 'BusRoutingCtrl'
         }
       }
     })

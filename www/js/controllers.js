@@ -14,68 +14,76 @@ angular.module('starter.controllers', [])
         header: { 'Accept': 'text/html' },
         method: 'POST'
       }).success(function (data, header, config, status) {
-        if (window.DOMParser)  //IE9+,FF,webkit
-        {
-          var domParser = new DOMParser();
-          var xmlDoc = domParser.parseFromString(data, 'text/html');
-          var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-          var stations = [];
-          for (var i = 1; i < nodelist.length; i++) {
-            var domStation = {
-              station: nodelist[i].children[0].textContent,
-              stationCode: nodelist[i].children[1].textContent,
-              local: nodelist[i].children[2].textContent,
-              street: nodelist[i].children[3].textContent,
-              sections: nodelist[i].children[4].textContent,
-              point: nodelist[i].children[5].textContent
+        try {
+          if (window.DOMParser)  //IE9+,FF,webkit
+          {
+            var domParser = new DOMParser();
+            var xmlDoc = domParser.parseFromString(data, 'text/html');
+            var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
+            var stations = [];
+            for (var i = 1; i < nodelist.length; i++) {
+              var domStation = {
+                station: nodelist[i].children[0].textContent,
+                stationCode: nodelist[i].children[1].textContent,
+                local: nodelist[i].children[2].textContent,
+                street: nodelist[i].children[3].textContent,
+                sections: nodelist[i].children[4].textContent,
+                point: nodelist[i].children[5].textContent
+              }
+              stations.push(domStation);
             }
-            stations.push(domStation);
+            $scope.buses = [];
+            stations.forEach(function (element) {
+              $scope.searchBusStateByStationCode(element.stationCode);
+            }, this);
           }
-          $scope.buses = [];
-          stations.forEach(function (element) {
-            $scope.searchBusStateByStationCode(element.stationCode);
-          }, this);
         }
+        finally { }
       }).error(function (data, header, config, status) {
         //处理响应失败
       });
     };
+
     
-    
-    $scope.searchBusStateByStationCode = function(stationCode) {
+    $scope.searchBusStateByStationCode = function (stationCode) {
       $http({
         url: 'http://www.szjt.gov.cn/apts/default.aspx',
         params: {
-          'StandCode':stationCode
+          'StandCode': stationCode
         },
         header: { 'Accept': 'text/html' },
         method: 'GET'
       }).success(function (data, header, config, status) {
-        if (window.DOMParser)  //IE9+,FF,webkit
-        {
-          var domParser = new DOMParser();
-          var xmlDoc = domParser.parseFromString(data, 'text/html');
-          var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-          for (var i = 1; i < nodelist.length; i++) {
-            var domBus = {
-              fromTo: nodelist[i].children[1].textContent,
-              carCode: nodelist[i].children[2].textContent,
-              time: nodelist[i].children[3].textContent,
-              distance: nodelist[i].children[4].textContent,
-            };
-            if(nodelist[i].children[0].children.length > 0) {
-              domBus.bus = nodelist[i].children[0].children[0].textContent;
-              domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23,36);
+        try {
+          if (window.DOMParser)  //IE9+,FF,webkit
+          {
+            var domParser = new DOMParser();
+            var xmlDoc = domParser.parseFromString(data, 'text/html');
+            var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
+            for (var i = 1; i < nodelist.length; i++) {
+              var domBus = {
+                fromTo: nodelist[i].children[1].textContent,
+                carCode: nodelist[i].children[2].textContent,
+                time: nodelist[i].children[3].textContent,
+                distance: nodelist[i].children[4].textContent,
+              };
+              if (nodelist[i].children[0].children.length > 0) {
+                domBus.bus = nodelist[i].children[0].children[0].textContent;
+                domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23, 36);
+              }
+              if (domBus.distance != '进站' && domBus.distance != '无车') {
+                domBus.distance = domBus.distance + '站';
+              }
+
+              $scope.buses.push(domBus);
             }
-            if(domBus.distance != '进站' && domBus.distance != '无车'){
-              domBus.distance = domBus.distance + '站';
-            }
-            
-            $scope.buses.push(domBus);
+            $scope.buses.sort(function (a, b) {
+              return b.bus - a.bus;
+            })
           }
-          $scope.buses.sort(function(a, b) {
-            return b.bus-a.bus;
-          })
+        }
+        finally {
+
         }
       }).error(function (data, header, config, status) {
         //处理响应失败
@@ -92,7 +100,7 @@ angular.module('starter.controllers', [])
           placeSearch.setCity('苏州');
           placeSearch.setPageSize(100);
           var point = [position.lng, position.lat];
-          point = [120.675203, 31.283536];
+          // point = [120.675203, 31.283536];
           placeSearch.searchNearBy('', point, 500, function (status, result) {
             if (status === 'complete' && result.info === 'OK') {
               //TODO : 解析返回结果,如果设置了map和panel，api将帮助完成点标注和列表
@@ -127,7 +135,11 @@ angular.module('starter.controllers', [])
     };
     
     $scope.refreshBuses = function () {
-      $scope.searchStationsByName($scope.currentStation.name);
+      if ($scope.currentStation == null) {
+        $scope.searchNearestStation();
+      } else {
+        $scope.searchStationsByName($scope.currentStation.name);
+      }
       $scope.$broadcast('scroll.refreshComplete');
     }
     
@@ -141,8 +153,13 @@ angular.module('starter.controllers', [])
     });
   })
   
-  .controller('BusDetailCtrl', function ($scope, $stateParams, $state, $ionicHistory, $http) {
-    var bus = angular.fromJson($stateParams.bus);
+  
+  
+  
+  
+  
+  .controller('BusDetailCtrl', function ($scope, $stateParams, $ionicHistory, $http) {
+    $scope.bus = angular.fromJson($stateParams.bus);
     $scope.arrivals = [];
     var map, geolocation;
     //加载地图，调用浏览器定位服务
@@ -166,7 +183,7 @@ angular.module('starter.controllers', [])
       $ionicHistory.goBack();
     };
 
-    $scope.searchBuslineArrivals = function (buslineCode) {
+    function searchBuslineArrivals(buslineCode) {
       $http({
         url: 'http://www.szjt.gov.cn/apts/APTSLine.aspx',
         params: {
@@ -175,32 +192,38 @@ angular.module('starter.controllers', [])
         header: { 'Accept': 'text/html' },
         method: 'GET'
       }).success(function (data, header, config, status) {
-        if (window.DOMParser)  //IE9+,FF,webkit
-        {
-          var domParser = new DOMParser();
-          var xmlDoc = domParser.parseFromString(data, 'text/html');
-          var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-          for (var i = 1; i < nodelist.length; i++) {
-            var domArrival = {
-              stationCode: nodelist[i].children[1].textContent,
-              carCode: nodelist[i].children[2].textContent,
-              arrivalTime: nodelist[i].children[3].textContent
-            };
-            if (nodelist[i].children[0].children.length > 0) {
-              domArrival.stationName = nodelist[i].children[0].children[0].textContent;
+        try {
+          if (window.DOMParser)  //IE9+,FF,webkit
+          {
+            var domParser = new DOMParser();
+            var xmlDoc = domParser.parseFromString(data, 'text/html');
+            var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
+            for (var i = 1; i < nodelist.length; i++) {
+              var domArrival = {
+                stationCode: nodelist[i].children[1].textContent,
+                carCode: nodelist[i].children[2].textContent,
+                arrivalTime: nodelist[i].children[3].textContent
+              };
+              if (nodelist[i].children[0].children.length > 0) {
+                domArrival.stationName = nodelist[i].children[0].children[0].textContent;
+              } else {
+                domArrival.stationName = '';
+              }
+              $scope.arrivals.push(domArrival);
             }
-            $scope.arrivals.push(domArrival);
+            $scope.arrivalContainer = {
+              'width': $scope.arrivals.length * 30 + 'px'
+            }
           }
-          $scope.arrivalContainer = {
-            'width': $scope.arrivals.length * 40 + 'px'
-          }
+        }
+        finally {
+
         }
       }).error(function (data, header, config, status) {
         //处理响应失败
         var b = 1;
       });
     };
-    $scope.searchBuslineArrivals(bus.code);
 
     /*公交线路查询*/
     function lineSearch() {
@@ -211,8 +234,8 @@ angular.module('starter.controllers', [])
         pageSize: 1,
         extensions: 'all'
       });
-      //搜索“536”相关公交线路
-      linesearch.search(bus.bus, function (status, result) {
+      //搜索相关公交线路
+      linesearch.search($scope.bus.bus, function (status, result) {
         if (status === 'complete' && result.info === 'OK') {
           lineSearch_Callback(result);
         } else {
@@ -231,13 +254,19 @@ angular.module('starter.controllers', [])
           var stops = lineArr[i].via_stops;
           var startPot = stops[0].location;
           var endPot = stops[stops.length - 1].location;
-
-          if (i == 0) drawbusLine(startPot, endPot, pathArr);
+          if (i == 0) drawbusLine(startPot, endPot, pathArr, stops);
         }
       }
     };
     /*绘制路线*/
-    function drawbusLine(startPot, endPot, BusArr) {
+    var infoWindow = new AMap.InfoWindow({ offset: new AMap.Pixel(0, 0) });
+    function drawbusLine(startPot, endPot, BusArr, stops) {
+      if (startPot.name != $scope.arrivals[0].stationName) {
+        var temp = startPot;
+        startPot = endPot;
+        endPot = temp;
+        stops.reverse();
+      }
       //绘制起点，终点
       new AMap.Marker({
         map: map,
@@ -255,37 +284,126 @@ angular.module('starter.controllers', [])
       busPolyline = new AMap.Polyline({
         map: map,
         path: BusArr,
-        strokeColor: "#09f",//线颜色
+        strokeColor: "#33cd5f",//线颜色
         strokeOpacity: 0.8,//线透明度
-        strokeWeight: 6//线宽
+        strokeWeight: 4//线宽
       });
+
+      for (var i = 1; i < stops.length - 2; i++) {
+        var stop = stops[i];
+        var arrivalTime = '';
+        var arrival;
+        $scope.arrivals.forEach(function (item) {
+          if (item.stationName == stop.name) {
+            arrival = item;
+            if (item.arrivalTime.length > 0) {
+              arrivalTime = item.arrivalTime;
+            }
+          }
+        });
+        var markerContent = '';
+        if (arrivalTime.length > 0) {
+          markerContent += '<div class="positive-bg icon ion-android-bus text-center" style="height:16px;width:16px;border-radius:8px;color:white;font-size:10px;line-height:16px"></div>';
+        } else {
+          markerContent += '<div class="balanced-bg text-center"';
+          markerContent += ' style="height:16px;width:16px;border-radius:8px;color:white;font-size:10px;line-height:16px">' + i + '</div>';
+        }
+        var marker = new AMap.Marker({ //添加自定义点标记
+          map: map,
+          position: [stop.location.lng, stop.location.lat], //基点位置
+          offset: new AMap.Pixel(-8, -8), //相对于基点的偏移位置
+          content: markerContent  //自定义点标记覆盖物内容
+        });
+        var infoContent = stop.name;
+        if (arrivalTime.length > 0) {
+          infoContent += '<br/>';
+          infoContent += arrivalTime;
+        }
+        marker.content = '<div class="text-center">' + infoContent + '</div>';
+        marker.on('click', function (e) {
+          infoWindow.setContent(e.target.content);
+          infoWindow.open(map, e.target.getPosition());
+        });
+        if (arrival) {
+          arrival.marker = marker;
+        }
+      }
+
       map.setFitView();
     };
-    
-    lineSearch();
-    
+
+    $scope.refresh = function () {
+      searchBuslineArrivals($scope.bus.code);
+      lineSearch();
+    };
+    $scope.onClickArrival = function (arrival) {
+      if (arrival.marker) {
+        arrival.marker.emit('click', { target: arrival.marker });
+        map.setZoomAndCenter(14, [arrival.marker.getPosition().lng, arrival.marker.getPosition().lat]);
+      }
+    }
+    $scope.refresh();
   })
-  
-  .controller('DashCtrl', function ($scope) { })
 
-  .controller('ChatsCtrl', function ($scope, Chats) {
-    // With the new view caching in Ionic, Controllers are only called
-    // when they are recreated or on app start, instead of every page change.
-    // To listen for when this page is active (for example, to refresh data),
-    // listen for the $ionicView.enter event:
-    //
-    //$scope.$on('$ionicView.enter', function(e) {
-    //});
 
-    $scope.chats = Chats.all();
-    $scope.remove = function (chat) {
-      Chats.remove(chat);
+
+  .controller('BuslineSearchCtrl', function ($scope, $http) {
+    $scope.buses = [];
+    $scope.searchBuslines = function (searchName) {
+      $http({
+        url: 'http://www.szjt.gov.cn/apts/APTSLine.aspx',
+        data: {
+          '__VIEWSTATE': '/wEPDwUJNDk3MjU2MjgyD2QWAmYPZBYCAgMPZBYCAgEPZBYCAgYPDxYCHgdWaXNpYmxlaGRkZJjIjf9wec64bUk0awl8Fmu9ZpeMHtOkmveJctfcLWzs',
+          '__VIEWSTATEGENERATOR': '964EC381',
+          '__EVENTVALIDATION': '/wEWAwLC6/qEDgL88Oh8AqX89aoKYSqjSGRgG6uatob0mRtv8UxGdjgHvVdIogSh29pwM0M=',
+          'ctl00$MainContent$LineName': searchName,
+          'ctl00$MainContent$SearchLine': '搜索'
+        },
+        header: { 'Accept': 'text/html' },
+        method: 'POST'
+      }).success(function (data, header, config, status) {
+        $scope.buses = [];
+        try {
+          if (window.DOMParser)  //IE9+,FF,webkit
+          {
+            var domParser = new DOMParser();
+            var xmlDoc = domParser.parseFromString(data, 'text/html');
+            var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
+            for (var i = 1; i < nodelist.length; i++) {
+              var domBus = {
+                fromTo: nodelist[i].children[1].textContent,
+              };
+              if (nodelist[i].children[0].children.length > 0) {
+                domBus.bus = nodelist[i].children[0].children[0].textContent;
+                domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23, 36);
+              }
+              $scope.buses.push(domBus);
+            }
+          }
+        } finally { }
+
+      }).error(function (data, header, config, status) {
+        //处理响应失败
+      });
     };
   })
 
-  .controller('ChatDetailCtrl', function ($scope, $stateParams, Chats) {
-    $scope.chat = Chats.get($stateParams.chatId);
-  })
+
+  .controller('BusRoutingCtrl', function ($scope, $sce, CurrentLocation) {
+    var auto = new AMap.Autocomplete({
+      input: "searchinput",
+      city: '苏州'
+    });
+    AMap.event.addListener(auto, "select", select);//注册监听，当选中某条记录时会触发
+    function select(e) {
+      CurrentLocation.get(function (position) {
+        var start = position.lng + ',' + position.lat;
+        var dest = e.poi.location.lng + ',' + e.poi.location.lat;
+        var url = 'http://m.amap.com/navi/?start=' + start + '&dest=' + dest + '&destName=' + e.poi.name + '&naviBy=bus&key=42972b43dee566eee381cb43eb72ee56';
+        $scope.targetUrl = $sce.trustAsResourceUrl(url);
+      });
+    }
+  }) 
 
   .controller('AccountCtrl', function ($scope) {
     $scope.settings = {

@@ -2,24 +2,24 @@
   <ion-nav-title ng-click="showPop($event)">
     <!--<button class="button button-clear ion-location" style="height:100%;">
       </button>-->
-    <i class="icon ion-location"></i>
+    <i class="icon ion-ios-location-outline"></i>
     {{currentStation.name}}
-    <i class="icon ion-chevron-down"></i>
+    <i class="icon ion-ios-arrow-down"></i>
     <!--<button class="button button-clear ion-chevron-down" style="height:100%;">
       </button>-->
   </ion-nav-title>
-  <ion-nav-buttons side="left">
-    <button class="button button-clear icon ion-aperture">
+  <!--<ion-nav-buttons side="left">
+    <button class="button button-clear icon ion-ios-color-filter-outline">
       </button>
-  </ion-nav-buttons>
+  </ion-nav-buttons>-->
   <ion-nav-buttons side="right">
-    <button class="button button-clear icon ion-refresh" ng-click="refreshBuses()">
+    <button class="button button-clear icon ion-ios-refresh-empty" ng-click="refreshBuses()">
       </button>
   </ion-nav-buttons>
   <ion-content class="dark-bg">
     <ion-refresher pulling-text="刷新公交" on-refresh="refreshBuses()"></ion-refresher>
-    <ion-list can-swipe="true">
-      <ion-item class="item item-dark" ng-repeat="bus in buses" href="#/tab/bus/{{bus}}">
+    <ion-list ng-hide="buses.length==0">
+      <ion-item class="item item-dark" ng-repeat="bus in buses" href="#/tab/nearbyBuses/{{bus}}">
         <h2 class="stable">{{bus.bus}}</h2>
         <span class="item-note" style="font-size: 22px;color:white">
           {{bus.distance}}

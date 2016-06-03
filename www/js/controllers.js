@@ -110,8 +110,8 @@ angular.module('starter.controllers', [])
                 pois.push(element);
               }, this);
               $scope.nearbyStations = pois;
-              $scope.currentStation = pois[0]
-              $scope.searchStationsByName($scope.currentStation.name);
+              $rootScope.currentStation = pois[0];
+              $scope.searchStationsByName($rootScope.currentStation.name);
             }
           });
         });
@@ -129,16 +129,16 @@ angular.module('starter.controllers', [])
     }
     
     $scope.selectStation = function (station) {
-      $scope.currentStation = station;
+      $rootScope.currentStation = station;
       $scope.searchStationsByName(station.name);
       $scope.popover.hide();
     };
     
     $scope.refreshBuses = function () {
-      if ($scope.currentStation == null) {
+      if ($rootScope.currentStation == null) {
         $scope.searchNearestStation();
       } else {
-        $scope.searchStationsByName($scope.currentStation.name);
+        $scope.searchStationsByName($rootScope.currentStation.name);
       }
       $scope.$broadcast('scroll.refreshComplete');
     }
@@ -158,7 +158,7 @@ angular.module('starter.controllers', [])
   
   
   
-  .controller('BusDetailCtrl', function ($scope, $stateParams, $ionicHistory, $http) {
+  .controller('BusDetailCtrl', function ($scope, $stateParams,$rootScope, $ionicHistory, $http) {
     $scope.bus = angular.fromJson($stateParams.bus);
     $scope.arrivals = [];
     var map, geolocation;
@@ -332,6 +332,16 @@ angular.module('starter.controllers', [])
       map.setFitView();
     };
 
+    $scope.iconClass = function(arrival) {
+      if(arrival.stationName == $rootScope.currentStation.name) {
+        return 'icon ion-android-pin';
+      } else if(arrival.arrivalTime.length > 0) {
+        return 'icon ion-android-bus';
+      } else {
+        return 'icon';
+      }
+    };
+    
     $scope.refresh = function () {
       searchBuslineArrivals($scope.bus.code);
       lineSearch();
@@ -410,3 +420,5 @@ angular.module('starter.controllers', [])
       enableFriends: true
     };
   });
+  
+ 

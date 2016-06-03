@@ -1,4 +1,4 @@
-<ion-view hide-nav-bar="false" view-title="{{bus.bus+'路'}}">
+<ion-view hide-nav-bar="false" hide-tabs="true" view-title="{{bus.bus+'路'}}">
     <ion-nav-buttons side="right">
         <button class="button button-clear icon ion-ios-refresh-empty" ng-click="refresh()">
       </button>
@@ -9,10 +9,10 @@
         <ion-scroll direction="x" class="wide-as-needed">
             <div ng-style="arrivalContainer">
                 <div class="text-center" ng-repeat="arrival in arrivals" ng-click="onClickArrival(arrival)" style='display: inline-block; width:30px; vertical-align:top'>
-                    <i ng-if="arrival.arrivalTime.length>0" class="icon ion-android-bus" style="color:white;font-size:18px"></i>
+                    <i ng-if="arrival.arrivalTime.length>0 || arrival.stationName == currentStation.name" ng-class="iconClass(arrival)" style="color:white;font-size:18px"></i>
                     <i ng-if="arrival.arrivalTime.length==0" style="font-size:18px">&nbsp;</i>
                     <hr color=#33cd5f width=100% size=2 align=center noshade></hr>
-                    <p style="margin:5px 5px;line-height:120%" ng-class="arrival.arrivalTime.length>0?'text-center balanced':'text-center stable'">
+                    <p style="margin:5px 5px;line-height:120%" class="text-center" ng-class="arrival.arrivalTime.length>0?'balanced':'stable'">
                         {{arrival.stationName}}
                     </p>
                 </div>

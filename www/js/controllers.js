@@ -158,7 +158,7 @@ angular.module('starter.controllers', [])
   
   
   
-  .controller('BusDetailCtrl', function ($scope, $stateParams,$rootScope, $ionicHistory, $http) {
+  .controller('BusDetailCtrl', function ($scope, $stateParams,$rootScope, $ionicHistory, $http, $ionicScrollDelegate) {
     $scope.bus = angular.fromJson($stateParams.bus);
     $scope.arrivals = [];
     var map, geolocation;
@@ -195,6 +195,7 @@ angular.module('starter.controllers', [])
         try {
           if (window.DOMParser)  //IE9+,FF,webkit
           {
+            var currentStationIndex = 0;
             var domParser = new DOMParser();
             var xmlDoc = domParser.parseFromString(data, 'text/html');
             var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
@@ -209,11 +210,20 @@ angular.module('starter.controllers', [])
               } else {
                 domArrival.stationName = '';
               }
+              if (domArrival.stationName ==$rootScope.currentStation.name) {
+                currentStationIndex = i;
+              }
               $scope.arrivals.push(domArrival);
             }
             $scope.arrivalContainer = {
               'width': $scope.arrivals.length * 30 + 'px'
-            }
+            };
+            
+            var screenWidth = window.screen.width;
+            var offset = screenWidth/60;
+            var index = currentStationIndex-offset-0.5;
+            $ionicScrollDelegate.scrollTo(30*(index > 0? index: 0), 0, true);
+            // $ionicScrollDelegate.scrollBottom();
           }
         }
         finally {
@@ -332,15 +342,18 @@ angular.module('starter.controllers', [])
       map.setFitView();
     };
 
-    $scope.iconClass = function(arrival) {
-      if(arrival.stationName == $rootScope.currentStation.name) {
-        return 'icon ion-android-pin';
-      } else if(arrival.arrivalTime.length > 0) {
-        return 'icon ion-android-bus';
-      } else {
-        return 'icon';
+    $scope.textClass = function (arrival) {
+      if (arrival.arrivalTime.length > 0) {
+        return 'balanced';
+      }
+      else if (arrival.stationName == $rootScope.currentStation.name) {
+        return 'energized';
+      }
+      else {
+        return 'stable';
       }
     };
+
     
     $scope.refresh = function () {
       searchBuslineArrivals($scope.bus.code);
@@ -399,20 +412,68 @@ angular.module('starter.controllers', [])
   })
 
 
-  .controller('BusRoutingCtrl', function ($scope, $sce, CurrentLocation) {
+  .controller('BusRoutingCtrl', function ($scope, $sce,$rootScope, CurrentLocation) {
     var auto = new AMap.Autocomplete({
       input: "searchinput",
       city: '苏州'
     });
+    //加载地图
+    var map = new AMap.Map('mapContainer', {
+      resizeEnable: true
+    });
+    map.setCity('苏州');
     AMap.event.addListener(auto, "select", select);//注册监听，当选中某条记录时会触发
     function select(e) {
-      CurrentLocation.get(function (position) {
-        var start = position.lng + ',' + position.lat;
-        var dest = e.poi.location.lng + ',' + e.poi.location.lat;
-        var url = 'http://m.amap.com/navi/?start=' + start + '&dest=' + dest + '&destName=' + e.poi.name + '&naviBy=bus&key=42972b43dee566eee381cb43eb72ee56';
-        $scope.targetUrl = $sce.trustAsResourceUrl(url);
-      });
-    }
+      // CurrentLocation.get(function (position) {
+        // var start = position.lng + ',' + position.lat;
+        // var dest = e.poi.location.lng + ',' + e.poi.location.lat;
+        // var url = 'http://m.amap.com/navi/?start=' + start + '&dest=' + dest + '&destName=' + e.poi.name + '&naviBy=bus&key=42972b43dee566eee381cb43eb72ee56';
+        // $scope.targetUrl = $sce.trustAsResourceUrl(url);
+               
+        var transOptions = {
+          map: map,
+          city: '苏州市',
+          panel: 'panel'
+          // policy: AMap.TransferPolicy.LEAST_TIME //乘车策略
+        };
+        //构造公交换乘类
+        var transfer = new AMap.Transfer(transOptions);
+        //根据起、终点名称查询公交换乘路线
+        transfer.search([{ keyword: $rootScope.currentStation.name }, { keyword: e.poi.name }]);
+        
+      // });
+    };
+    $scope.shouldHideMap = false;
+    $scope.panelStyle = {
+      'position': 'absolute',
+      'max-height': '80%',
+      'overflow-y': 'auto',
+      'top': '0px',
+      'right': '0px',
+      'min-width': '250px'
+    };
+    $scope.hideMap = function() {
+      $scope.shouldHideMap = !$scope.shouldHideMap;
+      if(!$scope.shouldHideMap) {
+        $scope.panelStyle =  {
+            'position': 'absolute',
+            'max-height': '80%',
+            'overflow-y': 'auto',
+            'top': '0px',
+            'right': '0px',
+            'min-width': '250px'
+        }
+      } else {
+        $scope.panelStyle =  {
+            'position': 'absolute',
+            'max-height': '100%',
+            'overflow-y': 'auto',
+            'top': '0px',
+            'right': '0px',
+            'width': '100%'
+        }
+      }
+    };
   }) 
 
   .controller('AccountCtrl', function ($scope) {

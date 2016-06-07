@@ -1,4 +1,4 @@
-<ion-view hide-nav-bar="false" hide-tabs="true" view-title="{{bus.bus+'路'}}">
+<ion-view id="view" hide-nav-bar="false" hide-tabs="true" view-title="{{bus.bus+'路'}}">
     <ion-nav-buttons side="right">
         <button class="button button-clear icon ion-ios-refresh-empty" ng-click="refresh()">
       </button>
@@ -8,11 +8,13 @@
         <p class="stable text-center" style="padding-top:6px;font-size:16px">{{bus.bus+'路 开往'+ bus.fromTo}}</p>
         <ion-scroll direction="x" class="wide-as-needed">
             <div ng-style="arrivalContainer">
-                <div class="text-center" ng-repeat="arrival in arrivals" ng-click="onClickArrival(arrival)" style='display: inline-block; width:30px; vertical-align:top'>
-                    <i ng-if="arrival.arrivalTime.length>0 || arrival.stationName == currentStation.name" ng-class="iconClass(arrival)" style="color:white;font-size:18px"></i>
-                    <i ng-if="arrival.arrivalTime.length==0" style="font-size:18px">&nbsp;</i>
-                    <hr color=#33cd5f width=100% size=2 align=center noshade></hr>
-                    <p style="margin:5px 5px;line-height:120%" class="text-center" ng-class="arrival.arrivalTime.length>0?'balanced':'stable'">
+                <div class="text-center" ng-repeat="arrival in arrivals" ng-click="onClickArrival(arrival)" style='display: inline-block; width:30px; vertical-align:top;line-height:120%'>
+                    <i class="icon ion-android-bus" ng-if="arrival.arrivalTime.length>0" style="color:white;font-size:18px"></i>
+                    <!--<i ng-if="arrival.arrivalTime.length==0" style="line-height:180%"><br></i>-->
+                    <i class="text-center stable" style="font-size:8px;line-height:100%">{{arrival.arrivalTime.substring(0,5)}}</i>
+                    <hr ng-if="arrival.arrivalTime.length==0" color=#33cd5f width=90% size=2 align=center noshade>
+                    <i ng-if="arrival.arrivalTime.length==0" style="line-height:140%"><br></i>
+                    <p style="margin:5px 5px;line-height:120%" class="text-center" ng-class="textClass(arrival)">
                         {{arrival.stationName}}
                     </p>
                 </div>

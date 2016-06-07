@@ -75,6 +75,14 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
   $ionicConfigProvider.backButton.previousTitleText(false).text('返回');
 })
 
+.config(function($sceDelegateProvider) {
+ $sceDelegateProvider.resourceUrlWhitelist([
+   // Allow same origin resource loads.
+   'self',
+   // Allow loading from our assets domain.  Notice the difference between * and **.
+   'http://m.amap.com/**']);
+ })
+
 .config(function($stateProvider, $urlRouterProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states

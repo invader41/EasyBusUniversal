@@ -1,0 +1,16 @@
+<ion-view view-title="换乘方案">
+      <ion-nav-buttons side="right">
+    <button class="button button-clear icon ion-map" ng-click="hideMap()">
+      </button>
+  </ion-nav-buttons>
+    <ion-header-bar class="bar bar-subheader item-input-inset bar-dark">
+        <label class="item-input-wrapper">
+        <i class="icon  ion-ios-search-strong placeholder-icon"></i>
+        <input id="searchinput" type="search" placeholder="{{'起点:'+currentStation.name+' 请输入目的地'}}"></input>
+        </label>
+    </ion-header-bar>
+    <ion-content class="has-header" scroll="true" overflow-scroll="true">
+        <div id="mapContainer" ng-hide="shouldHideMap" style="height:100%;width:100%"></div>
+        <div id="panel"  ng-style="panelStyle"></div>
+    </ion-content>
+</ion-view>

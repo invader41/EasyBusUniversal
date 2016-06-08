@@ -18,10 +18,10 @@
   </ion-nav-buttons>
   <ion-content class="dark-bg">
     <ion-refresher pulling-text="刷新公交" on-refresh="refreshBuses()"></ion-refresher>
-    <ion-list ng-hide="buses.length==0">
-      <ion-item class="item item-dark" ng-repeat="bus in buses" href="#/tab/nearbyBuses/{{bus}}">
+    <ion-list>
+      <ion-item class="item item-dark item-icon-right" ng-repeat="bus in buses" ng-click="clickItem(item)" href="#/tab/nearbyBuses/{{bus}}">
         <h2 class="stable">{{bus.bus}}</h2>
-        <span class="item-note" style="font-size: 22px;color:white">
+        <span class="item-note" style="font-size: 22px;color:white;">
           {{bus.distance}}
         </span>
         <p style="color:white">开往 {{bus.fromTo}} 方向</p>

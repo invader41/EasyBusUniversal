@@ -5,7 +5,9 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.services'], function($httpProvider) {
+angular.module('easyBus', ['ionic','ngCordova','easyBus.controllers','easyBus.services','easyBus.directives'])
+
+.config(function($httpProvider) {
   // Use x-www-form-urlencoded Content-Type
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
  
@@ -75,14 +77,6 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
   $ionicConfigProvider.backButton.previousTitleText(false).text('返回');
 })
 
-.config(function($sceDelegateProvider) {
- $sceDelegateProvider.resourceUrlWhitelist([
-   // Allow same origin resource loads.
-   'self',
-   // Allow loading from our assets domain.  Notice the difference between * and **.
-   'http://m.amap.com/**']);
- })
-
 .config(function($stateProvider, $urlRouterProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states
@@ -106,7 +100,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
     views: {
       'tab-nearbyBuses': {
         templateUrl: 'templates/tab-nearbyBuses.html',
-        controller: 'NearbyBusesCtrl'
+        controller: 'NearbyBusesController'
       }
     }
   })
@@ -115,7 +109,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
     url: "/nearbyBuses/:bus",
     views: {
       'tab-nearbyBuses': {
-          controller: "BusDetailCtrl",
+          controller: "BusDetailController",
           templateUrl: 'templates/bus-detail.html'
       }
     }
@@ -125,7 +119,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
     url: "/buslineSearch/:bus",
     views: {
       'tab-buslineSearch': {
-          controller: "BusDetailCtrl",
+          controller: "BusDetailController",
           templateUrl: 'templates/bus-detail.html'
       }
     }
@@ -136,7 +130,7 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       views: {
         'tab-buslineSearch': {
           templateUrl: 'templates/tab-buslineSearch.html',
-          controller: 'BuslineSearchCtrl'
+          controller: 'BuslineSearchController'
         }
       }
     })
@@ -146,37 +140,18 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
       views: {
         'tab-busRouting': {
           templateUrl: 'templates/tab-busRouting.html',
-          controller: 'BusRoutingCtrl'
+          controller: 'BusRoutingController'
         }
       }
     })
 
-  .state('tab.account', {
-    url: '/account',
-    views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
-      }
-    }
-  });
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/nearbyBuses');
 
-}).directive('hideTabs', function($rootScope) {
-    return {
-        restrict: 'A',
-        link: function(scope, element, attributes) {
-            scope.$on('$ionicView.beforeEnter', function() {
-                scope.$watch(attributes.hideTabs, function(value){
-                    $rootScope.hideTabs = value;
-                });
-            });
-
-            scope.$on('$ionicView.beforeLeave', function() {
-                $rootScope.hideTabs = false;
-            });
-        }
-    };
 });
+
+
+var controllersModule = angular.module('easyBus.controllers',[]);
+var servicesModule = angular.module('easyBus.services',[]);
+var directivesModule = angular.module('easyBus.directives',[]);

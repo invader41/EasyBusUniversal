@@ -1,0 +1,19 @@
+<ion-view view-title="线路查询">
+    <ion-header-bar class="bar bar-subheader item-input-inset bar-dark">
+        <label class="item-input-wrapper">
+        <i class="icon  ion-ios-search-strong placeholder-icon"></i>
+        <input type="search" placeholder="搜索" ng-model="searchName" ng-change="searchBuslines(searchName)"/>
+    </label>
+
+    </ion-header-bar>
+    <ion-content class="has-subheader has-header">
+        <p ng-hide="buses.length>0" class="text-center" style="margin-top:40%;font-size:24px">无搜索结果</p>
+        <ion-list ng-hide="buses.length==0">
+            <ion-item class="item item-icon-right" ng-repeat="bus in buses" href="#/tab/buslineSearch/{{bus}}">
+                <h2>{{bus.bus+'路'}}</h2>
+                <p>{{bus.fromTo+' 区间'}}</p>
+                <i class="icon ion-ios-arrow-forward"></i>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

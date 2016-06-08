@@ -23,11 +23,16 @@
     <script src="cordova.js"></script>
 
     <!-- your app's js -->
-    <script src="js/app.js"></script>
-    <script src="js/controllers.js"></script>
-    <script src="js/services.js"></script>
+    <script src="js/app.module.js"></script>
+    <script src="js/services/cordovaServices.js"></script>
+    <script src="js/services/currentLocation.js"></script>
+    <script src="js/controllers/busDetail.controller.js"></script>
+    <script src="js/controllers/buslineSearch.controller.js"></script>
+    <script src="js/controllers/busRouting.controller.js"></script>
+    <script src="js/controllers/nearbyBuses.controller.js"></script>
+    <script src="js/directives/hideTabs.directive.js"></script>
   </head>
-  <body ng-app="starter">
+  <body ng-app="easyBus">
     <!--
       The nav bar that will be updated as we navigate between views.
     -->

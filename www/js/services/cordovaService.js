@@ -3,7 +3,7 @@
 
     angular
         .module('easyBus.services')
-        .factory('CordovaService', ['$document', '$q', CordovaService]);
+        .service('CordovaService', ['$document', '$q', CordovaService]);
 
     function CordovaService($document, $q) {
         var d = $q.defer(),

@@ -151,7 +151,6 @@ angular.module('easyBus', ['ionic','ngCordova','easyBus.controllers','easyBus.se
 
 });
 
-
-var controllersModule = angular.module('easyBus.controllers',[]);
 var servicesModule = angular.module('easyBus.services',[]);
+var controllersModule = angular.module('easyBus.controllers',['easyBus.services']);
 var directivesModule = angular.module('easyBus.directives',[]);

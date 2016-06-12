@@ -2,7 +2,7 @@ angular
     .module('easyBus.controllers')
     .controller('BusRoutingController', BusRoutingController);
 
-function BusRoutingController($scope, $sce, $rootScope, CurrentLocation) {
+function BusRoutingController($scope, $sce, $rootScope) {
     var auto = new AMap.Autocomplete({
         input: "searchinput",
         city: '苏州'

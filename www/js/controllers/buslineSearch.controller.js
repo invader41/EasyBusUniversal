@@ -19,21 +19,16 @@ function BuslineSearchController($scope, $http) {
         }).success(function (data, header, config, status) {
             $scope.buses = [];
             try {
-                if (window.DOMParser)  //IE9+,FF,webkit
-                {
-                    var domParser = new DOMParser();
-                    var xmlDoc = domParser.parseFromString(data, 'text/html');
-                    var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-                    for (var i = 1; i < nodelist.length; i++) {
-                        var domBus = {
-                            fromTo: nodelist[i].children[1].textContent,
-                        };
-                        if (nodelist[i].children[0].children.length > 0) {
-                            domBus.bus = nodelist[i].children[0].children[0].textContent;
-                            domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23, 36);
-                        }
-                        $scope.buses.push(domBus);
+                var nodelist = jQuery.parseHTML(data)[6].getElementsByTagName('TABLE')[1].firstChild.children
+                for (var i = 1; i < nodelist.length; i++) {
+                    var domBus = {
+                        fromTo: nodelist[i].children[1].textContent,
+                    };
+                    if (nodelist[i].children[0].children.length > 0) {
+                        domBus.bus = nodelist[i].children[0].children[0].textContent;
+                        domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23, 36);
                     }
+                    $scope.buses.push(domBus);
                 }
             } finally { }
 

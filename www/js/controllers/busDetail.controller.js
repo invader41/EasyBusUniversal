@@ -38,38 +38,34 @@ function BusDetailController($scope, $stateParams, $rootScope, $ionicHistory, $h
             method: 'GET'
         }).success(function (data, header, config, status) {
             try {
-                if (window.DOMParser)  //IE9+,FF,webkit
-                {
-                    var currentStationIndex = 0;
-                    var domParser = new DOMParser();
-                    var xmlDoc = domParser.parseFromString(data, 'text/html');
-                    var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-                    for (var i = 1; i < nodelist.length; i++) {
-                        var domArrival = {
-                            stationCode: nodelist[i].children[1].textContent,
-                            carCode: nodelist[i].children[2].textContent,
-                            arrivalTime: nodelist[i].children[3].textContent
-                        };
-                        if (nodelist[i].children[0].children.length > 0) {
-                            domArrival.stationName = nodelist[i].children[0].children[0].textContent;
-                        } else {
-                            domArrival.stationName = '';
-                        }
-                        if (domArrival.stationName == $rootScope.currentStation.name) {
-                            currentStationIndex = i;
-                        }
-                        $scope.arrivals.push(domArrival);
-                    }
-                    $scope.arrivalContainer = {
-                        'width': $scope.arrivals.length * 30 + 'px'
+                var currentStationIndex = 0;
+                var nodelist = jQuery.parseHTML(data)[6].getElementsByTagName('TABLE')[1].firstChild.children;
+                for (var i = 1; i < nodelist.length; i++) {
+                    var domArrival = {
+                        stationCode: nodelist[i].children[1].textContent,
+                        carCode: nodelist[i].children[2].textContent,
+                        arrivalTime: nodelist[i].children[3].textContent
                     };
-
-                    var screenWidth = window.screen.width;
-                    var offset = screenWidth / 60;
-                    var index = currentStationIndex - offset - 0.5;
-                    $ionicScrollDelegate.scrollTo(30 * (index > 0 ? index : 0), 0, true);
-                    // $ionicScrollDelegate.scrollBottom();
+                    if (nodelist[i].children[0].children.length > 0) {
+                        domArrival.stationName = nodelist[i].children[0].children[0].textContent;
+                    } else {
+                        domArrival.stationName = '';
+                    }
+                    if (domArrival.stationName == $rootScope.currentStation.name) {
+                        currentStationIndex = i;
+                    }
+                    $scope.arrivals.push(domArrival);
                 }
+                $scope.arrivalContainer = {
+                    'width': $scope.arrivals.length * 30 + 'px'
+                };
+
+                var screenWidth = window.screen.width;
+                var offset = screenWidth / 60;
+                var index = currentStationIndex - offset - 0.5;
+                $ionicScrollDelegate.scrollTo(30 * (index > 0 ? index : 0), 0, true);
+                // $ionicScrollDelegate.scrollBottom();
+
             }
             finally {
 

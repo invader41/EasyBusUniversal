@@ -1,1 +1,7 @@
 /* Empty. Add your own CSS if you like */
+  .font-white>* {
+    color: white !important;
+  }
+  .dark-bg .scroll-refresher .ionic-refresher-content {
+    color: white;
+  }

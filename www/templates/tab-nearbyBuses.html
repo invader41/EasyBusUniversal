@@ -8,10 +8,10 @@
     <!--<button class="button button-clear ion-chevron-down" style="height:100%;">
       </button>-->
   </ion-nav-title>
-  <!--<ion-nav-buttons side="left">
-    <button class="button button-clear icon ion-ios-color-filter-outline">
+  <ion-nav-buttons side="left">
+    <button class="button button-clear icon ion-ios-color-filter-outline" ng-click="groupByColor()">
       </button>
-  </ion-nav-buttons>-->
+  </ion-nav-buttons>
   <ion-nav-buttons side="right">
     <button class="button button-clear icon ion-ios-refresh-empty" ng-click="refreshBuses()">
       </button>
@@ -19,13 +19,12 @@
   <ion-content class="dark-bg">
     <ion-refresher pulling-text="刷新公交" on-refresh="refreshBuses()"></ion-refresher>
     <ion-list>
-      <ion-item class="item item-dark item-icon-right" ng-repeat="bus in buses" ng-click="clickItem(item)" href="#/tab/nearbyBuses/{{bus}}">
-        <h2 class="stable">{{bus.bus}}</h2>
-        <span class="item-note" style="font-size: 22px;color:white;">
-          {{bus.distance}}
+      <ion-item class="item item-dark font-white" ng-repeat="bus in buses" ng-click="clickBus(bus)" ng-style="busItemStyle(bus)">
+        <h2 ng-bind="bus.bus"></h2>
+        <span class="item-note" ng-bind="bus.distance" style="font-size: 22px;">
         </span>
-        <p style="color:white">开往 {{bus.fromTo}} 方向</p>
-        <p style="color:white">距离 {{currentStation.name}}</p>
+        <p ng-bind="'开往 '+bus.fromTo+' 方向'" ></p>
+        <p ng-bind="'距离 '+currentStation.name"></p>
       </ion-item>
     </ion-list>
   </ion-content>

@@ -2,7 +2,7 @@ angular
     .module('easyBus.controllers')
     .controller('NearbyBusesController', NearbyBusesController);
 
-function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, CurrentLocation, CordovaService) {
+function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, $state, CurrentLocation, CordovaService) {
     $scope.searchStationsByName = function (stationName) {
         $http({
             url: 'http://www.szjt.gov.cn/apts/default.aspx',
@@ -17,28 +17,24 @@ function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, Current
             method: 'POST'
         }).success(function (data, header, config, status) {
             try {
-                if (window.DOMParser)  //IE9+,FF,webkit
-                {
-                    var domParser = new DOMParser();
-                    var xmlDoc = domParser.parseFromString(data, 'text/html');
-                    var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-                    var stations = [];
-                    for (var i = 1; i < nodelist.length; i++) {
-                        var domStation = {
-                            station: nodelist[i].children[0].textContent,
-                            stationCode: nodelist[i].children[1].textContent,
-                            local: nodelist[i].children[2].textContent,
-                            street: nodelist[i].children[3].textContent,
-                            sections: nodelist[i].children[4].textContent,
-                            point: nodelist[i].children[5].textContent
-                        }
-                        stations.push(domStation);
+                var nodelist = jQuery.parseHTML(data)[6].getElementsByTagName('TABLE')[1].firstChild.children;
+                var stations = [];
+                for (var i = 1; i < nodelist.length; i++) {
+                    var domStation = {
+                        station: nodelist[i].children[0].textContent,
+                        stationCode: nodelist[i].children[1].textContent,
+                        local: nodelist[i].children[2].textContent,
+                        street: nodelist[i].children[3].textContent,
+                        sections: nodelist[i].children[4].textContent,
+                        point: nodelist[i].children[5].textContent
                     }
-                    $scope.buses = [];
-                    stations.forEach(function (element) {
-                        $scope.searchBusStateByStationCode(element.stationCode);
-                    }, this);
+                    stations.push(domStation);
                 }
+                $scope.buses = [];
+                stations.forEach(function (element) {
+                    $scope.searchBusStateByStationCode(element.stationCode);
+                }, this);
+
             }
             finally { }
         }).error(function (data, header, config, status) {
@@ -57,32 +53,28 @@ function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, Current
             method: 'GET'
         }).success(function (data, header, config, status) {
             try {
-                if (window.DOMParser)  //IE9+,FF,webkit
-                {
-                    var domParser = new DOMParser();
-                    var xmlDoc = domParser.parseFromString(data, 'text/html');
-                    var nodelist = xmlDoc.getElementById('MainContent_DATA').getElementsByTagName('TABLE')[0].firstChild.children;
-                    for (var i = 1; i < nodelist.length; i++) {
-                        var domBus = {
-                            fromTo: nodelist[i].children[1].textContent,
-                            carCode: nodelist[i].children[2].textContent,
-                            time: nodelist[i].children[3].textContent,
-                            distance: nodelist[i].children[4].textContent,
-                        };
-                        if (nodelist[i].children[0].children.length > 0) {
-                            domBus.bus = nodelist[i].children[0].children[0].textContent;
-                            domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23, 36);
-                        }
-                        if (domBus.distance != '进站' && domBus.distance != '无车') {
-                            domBus.distance = domBus.distance + '站';
-                        }
-
-                        $scope.buses.push(domBus);
+                var nodelist = jQuery.parseHTML(data)[6].getElementsByTagName('TABLE')[1].firstChild.children;
+                for (var i = 1; i < nodelist.length; i++) {
+                    var domBus = {
+                        fromTo: nodelist[i].children[1].textContent,
+                        carCode: nodelist[i].children[2].textContent,
+                        time: nodelist[i].children[3].textContent,
+                        distance: nodelist[i].children[4].textContent,
+                    };
+                    if (nodelist[i].children[0].children.length > 0) {
+                        domBus.bus = nodelist[i].children[0].children[0].textContent;
+                        domBus.code = nodelist[i].children[0].children[0].getAttribute('href').substr(23, 36);
                     }
-                    $scope.buses.sort(function (a, b) {
-                        return b.bus - a.bus;
-                    })
+                    if (domBus.distance != '进站' && domBus.distance != '无车') {
+                        domBus.distance = domBus.distance + '站';
+                    }
+
+                    $scope.buses.push(domBus);
                 }
+                $scope.buses.sort(function (a, b) {
+                    return b.bus - a.bus;
+                })
+
             }
             finally {
 
@@ -136,6 +128,22 @@ function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, Current
         $scope.popover.hide();
     };
 
+    $scope.clickBus = function(item) {
+        $state.go('tab.nearbyBuses-detail',{bus:angular.toJson(item)});
+    };
+
+    var isGroupByColor = false;
+    $scope.groupByColor = function() {
+        isGroupByColor = !isGroupByColor;
+    };
+    $scope.busItemStyle = function (bus) {
+        if (isGroupByColor) {
+            return {
+                'background-color': stringToColor(bus.bus)
+            }
+        } 
+    }
+
     $scope.refreshBuses = function () {
         if ($rootScope.currentStation == null) {
             $scope.searchNearestStation();
@@ -154,3 +162,7 @@ function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, Current
         $scope.searchNearestStation();
     });
 };
+
+　　function stringToColor(str) {
+    　　　return ('#' + parseInt(str, 16) * 100).substring(0, 4);
+　　}

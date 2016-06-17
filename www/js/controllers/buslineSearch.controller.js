@@ -1,7 +1,7 @@
 angular
     .module('easyBus.controllers')
     .controller('BuslineSearchController', BuslineSearchController);
-
+        
 function BuslineSearchController($scope, $http) {
     $scope.buses = [];
     $scope.searchBuslines = function (searchName) {

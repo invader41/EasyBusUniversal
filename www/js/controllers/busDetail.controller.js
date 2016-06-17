@@ -3,6 +3,16 @@ angular
     .controller('BusDetailController', BusDetailController);
 
 
+/**
+ * (description)
+ * 
+ * @param $scope (description)
+ * @param $stateParams (description)
+ * @param $rootScope (description)
+ * @param $ionicHistory (description)
+ * @param {angular.IHttpService} $http (description)
+ * @param $ionicScrollDelegate (description)
+ */
 function BusDetailController($scope, $stateParams, $rootScope, $ionicHistory, $http, $ionicScrollDelegate) {
     $scope.bus = angular.fromJson($stateParams.bus);
     $scope.arrivals = [];

@@ -1,8 +1,17 @@
 angular
     .module('easyBus.controllers')
     .controller('NearbyBusesController', NearbyBusesController);
-
-function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, $state, CurrentLocation, CordovaService) {
+/**
+ * NearbyBusesController
+ * @param  {} $scope
+ * @param  {} $rootScope
+ * @param  {ionic.popover.IonicPopoverService} $ionicPopover
+ * @param  {angular.IHttpService} $http
+ * @param  {} $state
+ * @param  {} CurrentLocation
+ * @param  {} CordovaService
+ */
+function NearbyBusesController($scope, $rootScope, $ionicPopover ,$http, $state, CurrentLocation, CordovaService) {
     $scope.searchStationsByName = function (stationName) {
         $http({
             url: 'http://www.szjt.gov.cn/apts/default.aspx',
@@ -72,7 +81,7 @@ function NearbyBusesController($scope, $rootScope, $ionicPopover, $http, $state,
                     $scope.buses.push(domBus);
                 }
                 $scope.buses.sort(function (a, b) {
-                    return b.bus - a.bus;
+                    return parseInt(b.bus) - parseInt(a.bus);
                 })
 
             }

@@ -92,7 +92,30 @@
             "platform": "serve",
             "cwd": "${workspaceRoot}",
             "devServerAddress": "localhost",
+            "sourceMaps": true,
             "ionicLiveReload": true
+        },
+        {
+            "name": "Simulate Android in browser",
+            "type": "cordova",
+            "request": "launch",
+            "platform": "android",
+            "target": "chrome",
+            "simulatePort": 8000,
+            "livereload": true,
+            "sourceMaps": true,
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "name": "Simulate iOS in browser",
+            "type": "cordova",
+            "request": "launch",
+            "platform": "ios",
+            "target": "chrome",
+            "simulatePort": 8000,
+            "livereload": true,
+            "sourceMaps": true,
+            "cwd": "${workspaceRoot}"
         }
     ]
 }

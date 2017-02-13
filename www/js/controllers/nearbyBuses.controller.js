@@ -16,9 +16,9 @@ function NearbyBusesController($scope, $rootScope, $ionicPopover ,$http, $state,
         $http({
             url: 'http://www.szjt.gov.cn/apts/default.aspx',
             data: {
-                '__VIEWSTATE': '/wEPDwULLTE5ODM5MjcxNzlkZJjyY5yRvvioUwya4OEEvzuY1eO2+x5v1FdJc7CCQmFT',
+                '__VIEWSTATE': '/wEPDwULLTE5ODM5MjcxNzlkZG5FgcZjEw/Xcik6rLaQKQqjiJG1N/LcEaJpbqk1zMfT',
                 '__VIEWSTATEGENERATOR': '7BCA6D38',
-                '__EVENTVALIDATION': '/wEWBQL6h4/dDQLq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDqsVOHq8YTmi6g8ib2Iu2KAp+9fekWJmmAKeMsAka2pX',
+                '__EVENTVALIDATION': '/wEWBQKV37ujDALq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDjV831PkO9I9rzINcIDwIwK31J8x9g8zuNZKL7+XkZX5',
                 'ctl00$MainContent$StandName': stationName,
                 'ctl00$MainContent$SearchCode': '搜索'
             },

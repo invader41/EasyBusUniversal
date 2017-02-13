@@ -8,9 +8,9 @@ function BuslineSearchController($scope, $http) {
         $http({
             url: 'http://www.szjt.gov.cn/apts/APTSLine.aspx',
             data: {
-                '__VIEWSTATE': '/wEPDwUJNDk3MjU2MjgyD2QWAmYPZBYCAgMPZBYCAgEPZBYCAgYPDxYCHgdWaXNpYmxlaGRkZJjIjf9wec64bUk0awl8Fmu9ZpeMHtOkmveJctfcLWzs',
+                '__VIEWSTATE': '/wEPDwUJNDk3MjU2MjgyD2QWAmYPZBYCAgMPZBYCAgEPZBYCAgYPDxYCHgdWaXNpYmxlaGRkZArYd9NZeb6lYhNOScqHVvOmnKWkIejcJ7J2157Nz6l1',
                 '__VIEWSTATEGENERATOR': '964EC381',
-                '__EVENTVALIDATION': '/wEWAwLC6/qEDgL88Oh8AqX89aoKYSqjSGRgG6uatob0mRtv8UxGdjgHvVdIogSh29pwM0M=',
+                '__EVENTVALIDATION': '/wEWAwL5m9CTDgL88Oh8AqX89aoKFjHWxIvicIW2NoJRKPFu7zDvdWiw74UWlUePz1dAXk4=',
                 'ctl00$MainContent$LineName': searchName,
                 'ctl00$MainContent$SearchLine': '搜索'
             },
